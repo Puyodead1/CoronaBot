@@ -21,6 +21,7 @@ from datetime import datetime
 
 import Utils
 from Utils import getLogger, CoronaAPI
+from discord.errors import HTTPException, Forbidden, InvalidArgument
 
 
 class Corona(commands.Cog):
@@ -81,9 +82,19 @@ class Corona(commands.Cog):
             embed.add_field(name="Total Cases", value=data["cases"], inline=False)
             embed.add_field(name="Total Deaths", value=data["deaths"], inline=False)
             embed.add_field(name="Total Recoveries", value=data["recovered"], inline=False)
-            await ctx.channel.send(embed=embed, content=None)
+            try:
+                await ctx.send(content=None, embed=embed)
+            except Forbidden as e:
+                await ctx.send(content=f"Missing permission! Error: {e.text}")
+            except HTTPException as e:
+                await ctx.send(content=f"Failed to send message! Error: {e.text}")
         else:
-            await ctx.channel.send("Failed to get data!")
+            try:
+                await ctx.send("Failed to get data!")
+            except Forbidden as e:
+                await ctx.send(content=f"Missing permission! Error: {e.text}")
+            except HTTPException as e:
+                await ctx.send(content=f"Failed to send message! Error: {e.text}")
 
     @commands.command("country", help="Gets all coronavirus information from a country")
     async def corona_country(self, ctx, *, country):
@@ -99,10 +110,20 @@ class Corona(commands.Cog):
             embed.add_field(name=f"Total Deaths Today in {data['country']}", value=data["todayDeaths"], inline=False)
             embed.add_field(name=f"Total Recoveries in {data['country']}", value=data["recovered"], inline=False)
             embed.add_field(name=f"Total Critical in {data['country']}", value=data["critical"], inline=False)
-            await ctx.channel.send(embed=embed, content=None)
+            try:
+                await ctx.send(content=None, embed=embed)
+            except Forbidden as e:
+                await ctx.send(content=f"Missing permission! Error: {e.text}")
+            except HTTPException as e:
+                await ctx.send(content=f"Failed to send message! Error: {e.text}")
         else:
-            await ctx.channel.send("Failed to get data! Invalid country or other error occurred! use `corona "
+            try:
+                await ctx.send("Failed to get data! Invalid country or other error occurred! use `corona "
                                    "countries` for a list of valid countries!")
+            except Forbidden as e:
+                await ctx.send(content=f"Missing permission! Error: {e.text}")
+            except HTTPException as e:
+                await ctx.send(content=f"Failed to send message! Error: {e.text}")
 
     @commands.command("countries", help="Gets a list of valid countries for country command")
     async def corona_countries(self, ctx):
@@ -118,14 +139,24 @@ class Corona(commands.Cog):
             embed.set_footer(text=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
             embed.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
 
-            country_list_message = await ctx.send(content=None, embed=embed)
-            if page + 1 <= 1 or page + 1 < len(pagination):
-                await country_list_message.add_reaction("➡")
-            await country_list_message.add_reaction("❌")
+            try:
+                country_list_message = await ctx.send(content=None, embed=embed)
+                if page + 1 <= 1 or page + 1 < len(pagination):
+                    await country_list_message.add_reaction("➡")
+                await country_list_message.add_reaction("❌")
 
-            await self.process_reactions(ctx, country_list_message, page, pagination, list_type="Country")
+                await self.process_reactions(ctx, country_list_message, page, pagination, list_type="Country")
+            except Forbidden as e:
+                await ctx.send(content=f"Missing permission! Error: {e.text}")
+            except HTTPException as e:
+                await ctx.send(content=f"Failed to send message! Error: {e.text}")
         else:
-            await ctx.channel.send("Failed to get data!")
+            try:
+                await ctx.send("Failed to get data")
+            except Forbidden as e:
+                await ctx.send(content=f"Missing permission! Error: {e.text}")
+            except HTTPException as e:
+                await ctx.send(content=f"Failed to send message! Error: {e.text}")
 
     @commands.command("states", help="Gets a list of valid states/provinces")
     async def corona_states(self, ctx):
@@ -141,14 +172,24 @@ class Corona(commands.Cog):
             embed.set_footer(text=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
             embed.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
 
-            country_list_message = await ctx.send(content=None, embed=embed)
-            if page + 1 <= 1 or page + 1 < len(pagination):
-                await country_list_message.add_reaction("➡")
-            await country_list_message.add_reaction("❌")
+            try:
+                country_list_message = await ctx.send(content=None, embed=embed)
+                if page + 1 <= 1 or page + 1 < len(pagination):
+                    await country_list_message.add_reaction("➡")
+                await country_list_message.add_reaction("❌")
 
-            await self.process_reactions(ctx, country_list_message, page, pagination, list_type="Province/State")
+                await self.process_reactions(ctx, country_list_message, page, pagination, list_type="Province/State")
+            except Forbidden as e:
+                await ctx.send(content=f"Missing permission! Error: {e.text}")
+            except HTTPException as e:
+                await ctx.send(content=f"Failed to send message! Error: {e.text}")
         else:
-            await ctx.channel.send("Failed to get data!")
+            try:
+                await ctx.send("Failed to get data!")
+            except Forbidden as e:
+                await ctx.send(content=f"Missing permission! Error: {e.text}")
+            except HTTPException as e:
+                await ctx.send(content=f"Failed to send message! Error: {e.text}")
 
     @commands.command("state", help="Gets all coronavirus information from a state")
     async def corona_state(self, ctx, *, state):
@@ -162,16 +203,26 @@ class Corona(commands.Cog):
             embed.add_field(name=f"Total Cases in {data['Province/State'] + ' - ' + data['Country/Region']}", value=data["Confirmed"], inline=False)
             embed.add_field(name=f"Total Deaths in {data['Province/State'] + ' - ' + data['Country/Region']}", value=data["Deaths"], inline=False)
             embed.add_field(name=f"Total Recoveries in {data['Province/State'] + ' - ' + data['Country/Region']}", value=data["Recovered"], inline=False)
-            await ctx.channel.send(embed=embed, content=None)
+            try:
+                await ctx.send(content=None, embed=embed)
+            except Forbidden as e:
+                await ctx.send(content=f"Missing permission! Error: {e.text}")
+            except HTTPException as e:
+                await ctx.send(content=f"Failed to send message! Error: {e.text}")
         else:
-            await ctx.channel.send(
+            try:
+                await ctx.send(
                 "Failed to get data! Invalid state or other error occurred! use `corona states` for a list of valid "
                 "states/provinces!")
+            except Forbidden as e:
+                await ctx.send(content=f"Missing permission! Error: {e.text}")
+            except HTTPException as e:
+                await ctx.send(content=f"Failed to send message! Error: {e.text}")
 
     @commands.command("province", help="Gets all coronavirus information from a province")
     async def corona_province(self, ctx, *, province):
         if province is None:
-            return await ctx.channel.send("Please provide a state/province to get data for!")
+            return await ctx.send("Please provide a state/province to get data for!")
         data = CoronaAPI().getState(province)
         if data is not None:
             embed = discord.Embed(title=None,
@@ -183,11 +234,21 @@ class Corona(commands.Cog):
                             value=data["Deaths"], inline=False)
             embed.add_field(name=f"Total Recoveries in {data['Province/State'] + '-' + data['Country/Region']}",
                             value=data["Recovered"], inline=False)
-            await ctx.channel.send(embed=embed, content=None)
+            try:
+                await ctx.send(content=None, embed=embed)
+            except Forbidden as e:
+                await ctx.send(content=f"Missing permission! Error: {e.text}")
+            except HTTPException as e:
+                await ctx.send(content=f"Failed to send message! Error: {e.text}")
         else:
-            await ctx.channel.send(
+            try:
+                await ctx.send(
                 "Failed to get data! Invalid state or other error occurred! use `corona states` for a list of valid "
                 "states/provinces!")
+            except Forbidden as e:
+                await ctx.send(content=f"Missing permission! Error: {e.text}")
+            except HTTPException as e:
+                await ctx.send(content=f"Failed to send message! Error: {e.text}")
 
     @commands.command("countryoverview", help="Gets all coronavirus information for each country")
     async def corona_country_overview(self, ctx):
@@ -203,14 +264,24 @@ class Corona(commands.Cog):
             embed.set_footer(text=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
             embed.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
 
-            country_list_message = await ctx.send(content=None, embed=embed)
-            if page + 1 <= 1 or page + 1 < len(pagination):
-                await country_list_message.add_reaction("➡")
-            await country_list_message.add_reaction("❌")
+            try:
+                country_list_message = await ctx.send(content=None, embed=embed)
+                if page + 1 <= 1 or page + 1 < len(pagination):
+                    await country_list_message.add_reaction("➡")
+                await country_list_message.add_reaction("❌")
 
-            await self.process_reactions(ctx, country_list_message, page, pagination, list_type="Country Overview")
+                await self.process_reactions(ctx, country_list_message, page, pagination, list_type="Country Overview")
+            except Forbidden as e:
+                await ctx.send(content=f"Missing permission! Error: {e.text}")
+            except HTTPException as e:
+                await ctx.send(content=f"Failed to send message! Error: {e.text}")
         else:
-            await ctx.channel.send("Failed to get data!")
+            try:
+                await ctx.send("Failed to get data!")
+            except Forbidden as e:
+                await ctx.send(content=f"Missing permission! Error: {e.text}")
+            except HTTPException as e:
+                await ctx.send(content=f"Failed to send message! Error: {e.text}")
 
 
 def setup(bot):
